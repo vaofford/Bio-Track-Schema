@@ -7,6 +7,7 @@ use Moose;
 use MooseX::NonMoose;
 
 use Carp qw ( croak );
+use File::Slurp;
 
 extends 'DBIx::Class::ResultSet';
 
@@ -39,7 +40,7 @@ C<processed> column. C<$processed_flag> defaults to 0, i.e. all rows.
 
 =cut
 
-# original query (from Path::Find::Lanes
+# original query (from Path::Find::Lanes):
 # my $search_term = 'select lane.name from latest_lane as lane where'
 #       . ' ( lane.name = "'
 #       . $search_id . '"'
@@ -55,7 +56,7 @@ C<processed> column. C<$processed_flag> defaults to 0, i.e. all rows.
 sub get_lanes_by_lane_name {
   my ( $self, $name ) = @_;
   # we don't care about $processed_flag here, since it's handled entirely in the
-  # 'around' method
+  # 'around' method. Similarly, the 'around' modifier checks for a value in $name
 
   my $rs = $self->search(
     {
@@ -281,7 +282,78 @@ sub get_lanes_by_species_name {
 
 #-------------------------------------------------------------------------------
 
-# TODO add the rest of the search methods from Path::Find::Lanes, plus tests
+=head2 get_lanes_from_id_file($filename, $file_id_type, ?$processed_flag)
+
+Returns a reference to an array containing L<DBIx::Class::Result|Result>
+objects matching the lane or sample IDs in the supplied file. The type of ID in
+the file must be specified and must be either C<lane> or C<sample>. If
+C<$processed_flag> is given, it will be used to filter the results, as in the
+other C<get_lanes_by...> methods.
+
+Note that because the returned array is made up of multiple result sets, one
+per ID from the file, the final set of lanes is not ordered. If you want the
+C<DBIx::Class::Result|Result> objects sorted, use something like:
+
+ @sorted = sort { $a->name <=> $b->name } @$lanes;
+
+=cut
+
+sub get_lanes_from_id_file {
+  my ( $self, $filename, $file_id_type, $processed_flag ) = @_;
+
+  croak 'ERROR: must supply a valid filename'
+    unless ( defined $filename and -f $filename );
+
+  # "read_file" will croak if it can't read the supplied filename
+  my @ids = read_file($filename);
+
+  return $self->get_lanes_from_id_list(\@ids, $file_id_type, $processed_flag );
+}
+
+#-------------------------------------------------------------------------------
+
+=head2 get_lanes_from_ids($id, $file_id_type, ?$processed_flag)
+
+Given a reference to a list of IDs, C<$ids>, the type of those IDs
+(C<$file_id_type>), which must be either C<lane> or C<sample>, and an optional
+C<$processed_flag>, this method returns a reference to an array containing
+L<DBIx::Class::Result|Result> objects matching the supplied lane or sample IDs.
+
+Note that because the returned array is made up of multiple result sets, one
+per ID from the file, the final set of lanes is not ordered. If you want the
+C<DBIx::Class::Result|Result> objects sorted, use something like:
+
+ @sorted = sort { $a->name <=> $b->name } @$lanes;
+
+=cut
+
+sub get_lanes_from_id_list {
+  my ( $self, $ids, $file_id_type, $processed_flag ) = @_;
+
+  croak 'ERROR: must supply at least one ID to search on'
+    unless scalar @$ids;
+
+  croak 'ERROR: $file_id_type must be either "lane" or "sample"'
+    unless ( defined $file_id_type and $file_id_type =~ m/^(lane|sample)$/ );
+
+  my @rs;
+  foreach my $id ( @$ids ) {
+    next if $id =~ m/^#/; # skip comment lines
+    chomp $id;            # trim off newlines before passing ID to the DB
+    my $method = "get_lanes_by_${file_id_type}_name";
+    my $rs = $self->$method($id, $processed_flag);
+    push @rs, $rs->all if $rs;
+  }
+
+  return \@rs;
+}
+
+#-------------------------------------------------------------------------------
+
+# TODO the only method in Path::Find::Lanes that isn't in some way duplicated
+# TODO here is "_lookup_by_database". It's tricky to look into other databases
+# TODO in the context of DBIC, so that functionality would need to be build
+# TODO higher up the stack, where the schema connections are made
 
 #-------------------------------------------------------------------------------
 #- method modifiers ------------------------------------------------------------
