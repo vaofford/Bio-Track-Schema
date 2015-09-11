@@ -16,31 +16,70 @@ __PACKAGE__->load_namespaces;
 
 # ABSTRACT: DBIC schema for the tracking databases
 
+use Carp qw( croak );
+
 #-------------------------------------------------------------------------------
+#- class variables -------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
+# this is a mapping between the type of ID that the caller specifies and the
+# search methods that are found in Bio::Track::Schema::ResultSet::LatestLane.
+
+our $_search_methods = {
+  lane    => 'get_lanes_by_lane_name',
+  sample  => 'get_lanes_by_sample_name',
+  study   => 'get_lanes_by_study_id',
+  library => 'get_lanes_by_library_name',
+  species => 'get_lanes_by_species_name',
+};
+
+#-------------------------------------------------------------------------------
+#- public methods --------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
+=head1 METHODS
+
+=head2 get_lanes_by_id($lane_id, $id_type, ?$processed_flag)
+
+Returns a L<DBIx::Class::ResultSet|ResultSet> containing
+L<Bio::Track::Schema::Result::LatestLane> objects matching the given ID,
+C<$lane_id>. The type of the ID must be specified (C<$id_type>). If
+C<$processed_flag> is given, it will be used to filter the returned lanes.
+See L<Bio::Track::Schema::ResultSet::LatestLane::get_lanes_by_lane_name>.
+
+The accepted ID types are:
+
+=over
+
+=item lane
+
+=item sample
+
+=item study
+
+=item library
+
+=item species
+
+=back
+
+=cut
 
 sub get_lanes_by_id {
   my ( $self, $lane_id, $id_type, $processed_flag ) = @_;
 
-  if ( $id_type eq 'lane' ) {
-    return $self->resultset('LatestLane')->get_lanes_by_lane_id($lane_id, $processed_flag);
-  }
-  elsif( $id_type eq 'sample' ) {
-    return $self->resultset('LatestLane')->get_lanes_by_sample_id($lane_id, $processed_flag);
-  }
-}
+  croak 'ERROR: must supply a name or ID to search with'
+    unless ( defined $lane_id and $lane_id ne '' );
 
-#-------------------------------------------------------------------------------
+  croak 'ERROR: must specify the ID type'
+    unless ( defined $id_type and $id_type ne '' );
 
-sub get_lanes_by_lane_id {
-  my ( $self, $lane_id, $processed_flag ) = @_;
-  return $self->resultset('LatestLane')->get_lanes_by_lane_id($lane_id, $processed_flag);
-}
+  croak "ERROR: not a valid ID type ($id_type)"
+    unless $_search_methods->{$id_type};
 
-#-------------------------------------------------------------------------------
+  my $method = $_search_methods->{$id_type};
 
-sub get_lanes_by_sample_id {
-  my ( $self, $lane_id, $processed_flag ) = @_;
-  return $self->resultset('LatestLane')->get_lanes_by_sample_id($lane_id, $processed_flag);
+  return $self->resultset('LatestLane')->$method($lane_id, $processed_flag);
 }
 
 #-------------------------------------------------------------------------------
