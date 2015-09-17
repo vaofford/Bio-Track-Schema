@@ -35,6 +35,8 @@ has 'path' => (
 sub _build_path {
   my ( $self, $template ) = @_;
 
+  # TODO since there's no way to pass in $template here, this is effectively
+  # TODO hard-coded. Need to find a way to fix that...
   $template ||= 'genus:species-subspecies:TRACKING:projectssid:sample:technology:library:lane';
 
   # build a list of path components, based on the template
