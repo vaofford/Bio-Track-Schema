@@ -273,6 +273,13 @@ FROM `library` WHERE `library`.`latest` = 1
 ) );
 
 __PACKAGE__->belongs_to(
+  "seq_tech",
+  "Bio::Track::Schema::Result::SeqTech",
+  { seq_tech_id => "seq_tech_id" },
+  { is_deferrable => 1, on_delete => "NO ACTION", on_update => "NO ACTION" },
+);
+
+__PACKAGE__->belongs_to(
   "latest_sample",
   "Bio::Track::Schema::Result::LatestSample",
   { sample_id => "sample_id" },
