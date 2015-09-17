@@ -25,13 +25,13 @@ use Carp qw( croak );
 # this is a mapping between the type of ID that the caller specifies and the
 # search methods that are found in Bio::Track::Schema::ResultSet::LatestLane.
 
-our $_search_methods = {
+our %_search_methods = (
   lane    => 'get_lanes_by_lane_name',
   sample  => 'get_lanes_by_sample_name',
   study   => 'get_lanes_by_study_id',
   library => 'get_lanes_by_library_name',
   species => 'get_lanes_by_species_name',
-};
+);
 
 #-------------------------------------------------------------------------------
 #- public methods --------------------------------------------------------------
@@ -75,9 +75,9 @@ sub get_lanes_by_id {
     unless ( defined $id_type and $id_type ne '' );
 
   croak "ERROR: not a valid ID type ($id_type)"
-    unless $_search_methods->{$id_type};
+    unless $_search_methods{$id_type};
 
-  my $method = $_search_methods->{$id_type};
+  my $method = $_search_methods{$id_type};
 
   return $self->resultset('LatestLane')->$method($lane_id, $processed_flag);
 }
