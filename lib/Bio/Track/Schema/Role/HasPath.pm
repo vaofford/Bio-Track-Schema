@@ -8,7 +8,7 @@ use File::Spec;
 
 use Types::Standard qw( HashRef Str );
 
-our %_known_path_fragments = {
+our %_known_path_fragments = (
   genus                => 1,
   individual           => 1,
   lane                 => 1,
@@ -20,7 +20,7 @@ our %_known_path_fragments = {
   'species-subspecies' => 1,
   strain               => 1,
   technology           => 1
-};
+);
 
 has 'path' => (
   is      => 'ro',
