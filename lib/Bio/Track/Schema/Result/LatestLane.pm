@@ -283,6 +283,16 @@ __PACKAGE__->add_columns(
 # Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-07-30 09:36:06
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1y2wL+EwvT/62F7VolmXOA
 
+use Types::Standard qw( Str );
+
+with 'Bio::Track::Schema::Role::HasPath';
+
+# this is the name of the database in which this result was found
+has 'database_name' => (
+  is  => 'rw',
+  isa => Str,
+);
+
 __PACKAGE__->result_source_instance->view_definition( q(
 SELECT `row_id`, `lane_id`, `library_id`, `seq_request_id`, `name`,
   `hierarchy_name`, `acc`, `readlen`, `paired`, `raw_reads`, `raw_bases`,
