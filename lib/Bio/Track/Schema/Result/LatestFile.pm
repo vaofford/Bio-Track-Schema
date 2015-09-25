@@ -194,5 +194,12 @@ SELECT `row_id`, `file_id`, `lane_id`, `name`, `hierarchy_name`, `processed`,
 FROM `file` WHERE `file`.`latest` = 1
 ) );
 
+__PACKAGE__->belongs_to(
+  "latest_lane",
+  "Bio::Track::Schema::Result::LatestLane",
+  { lane_id => "lane_id" },
+  { is_deferrable => 1, on_delete => "NO ACTION", on_update => "NO ACTION" },
+);
+
 __PACKAGE__->meta->make_immutable;
 1;

@@ -287,7 +287,8 @@ use Types::Standard qw( Str );
 
 with 'Bio::Track::Schema::Role::HasPath';
 
-# this is the name of the database in which this result was found
+# this is the name of the database in which this result was found, e.g.
+# pathogen_prok_track
 has 'database_name' => (
   is  => 'rw',
   isa => Str,
@@ -307,6 +308,13 @@ __PACKAGE__->belongs_to(
   "Bio::Track::Schema::Result::LatestLibrary",
   { library_id => "library_id" },
   { is_deferrable => 1, on_delete => "NO ACTION", on_update => "NO ACTION" },
+);
+
+__PACKAGE__->has_many(
+  "latest_files",
+  "Bio::Track::Schema::Result::LatestFile",
+  { 'foreign.lane_id' => 'self.lane_id' },
+  { cascade_copy => 0, cascade_delete => 0 },
 );
 
 __PACKAGE__->meta->make_immutable;
