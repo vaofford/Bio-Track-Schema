@@ -4,7 +4,7 @@ package Bio::Track::Schema::Role::HasPath;
 use Moose::Role;
 use namespace::autoclean;
 
-use File::Spec;
+use Path::Class;
 
 use Types::Standard qw( HashRef Str );
 
@@ -78,7 +78,7 @@ sub _build_path {
   }
 
   # return the concatenated components of the path
-  return File::Spec->catdir(@path);
+  return file(@path)->stringify;
 }
 
 sub _get_genus_species {
