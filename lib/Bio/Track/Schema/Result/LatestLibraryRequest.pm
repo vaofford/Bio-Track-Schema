@@ -1,8 +1,8 @@
 use utf8;
 package Bio::Track::Schema::Result::LatestLibraryRequest;
 
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
+### Created by DBIx::Class::Schema::Loader
+### DO NOT MODIFY THE FIRST PART OF THIS FILE
 
 =head1 NAME
 
@@ -16,21 +16,8 @@ use warnings;
 use Moose;
 use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
-extends 'DBIx::Class::Core';
+extends 'Bio::Track::Schema::ResultBase';
 
-=head1 COMPONENTS LOADED
-
-=over 4
-
-=item * L<DBIx::Class::InflateColumn::DateTime>
-
-=item * L<DBIx::Class::TimeStamp>
-
-=back
-
-=cut
-
-__PACKAGE__->load_components("InflateColumn::DateTime", "TimeStamp");
 __PACKAGE__->table_class("DBIx::Class::ResultSource::View");
 
 =head1 TABLE: C<latest_library_request>
@@ -137,8 +124,10 @@ __PACKAGE__->add_columns(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-07-30 09:36:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2knMlAYiX7367YoAzYkSTw
+# Modified above this point; do not regenerate with loader
+#
+### Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-07-30 09:36:06
+### DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2knMlAYiX7367YoAzYkSTw
 
 __PACKAGE__->result_source_instance->view_definition( q(
 SELECT `row_id`, `library_request_id`, `sample_id`, `ssid`,
@@ -146,5 +135,5 @@ SELECT `row_id`, `library_request_id`, `sample_id`, `ssid`,
 FROM `library_request` WHERE `library_request`.`latest` = 1
 ) );
 
-__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable( inline_constructor => 0 );
 1;
