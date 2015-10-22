@@ -82,6 +82,13 @@ __PACKAGE__->table("project");
   default_value: 0
   is_nullable: 1
 
+=head2 data_access_group
+
+  data_type: 'varchar'
+  default_value: (empty string)
+  is_nullable: 1
+  size: 255
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -112,6 +119,8 @@ __PACKAGE__->add_columns(
   },
   "latest",
   { data_type => "tinyint", default_value => 0, is_nullable => 1 },
+  "data_access_group",
+  { data_type => "varchar", default_value => "", is_nullable => 1, size => 255 },
 );
 
 =head1 PRIMARY KEY
@@ -140,6 +149,14 @@ __PACKAGE__->has_many(
   "samples",
   "Bio::Track::Schema::Result::Sample",
   { "foreign.project_id" => "self.project_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+
+__PACKAGE__->belongs_to(
+  "studies",
+  "Bio::Track::Schema::Result::Study",
+  { "foreign.study_id" => "self.study_id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
