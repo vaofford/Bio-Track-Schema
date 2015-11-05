@@ -5,6 +5,8 @@ use Moose::Role;
 use namespace::autoclean;
 
 use Path::Class;
+use Try::Tiny;
+use Carp qw( croak );
 
 use Types::Standard qw( HashRef Str );
 
@@ -84,7 +86,12 @@ sub _build_path {
 sub _get_genus_species {
   my $self = shift;
 
-  my $genus_species = $self->latest_library->latest_sample->individual->species->name;
+  my $genus_species;
+  try {
+    $genus_species = $self->latest_library->latest_sample->individual->species->name;
+  } catch {
+    croak q(ERROR: couldn't get species name for lane);
+  };
 
   # as per the original code in VRTrack::VRTrack::hierarchy_path_of_object,
   # genus is everything before the first space, species is everything after it
