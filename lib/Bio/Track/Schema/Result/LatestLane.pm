@@ -335,6 +335,13 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+__PACKAGE__->has_many(
+  "latest_mapstats",
+  "Bio::Track::Schema::Result::LatestMapstat",
+  { 'foreign.lane_id' => 'self.lane_id' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 # the guts of this are cargo-culted from VRTrack::VRTrack::hierarchy_path_of_object
 # and associated VRTrack classes
 

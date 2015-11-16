@@ -426,6 +426,8 @@ __PACKAGE__->add_columns(
 ### Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-07-30 09:36:06
 ### DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:FTt0lgx5rSERNNs0nFg4bQ
 
+__PACKAGE__->set_primary_key('row_id');
+
 __PACKAGE__->result_source_instance->view_definition( q(
 SELECT `row_id`, `mapstats_id`, `lane_id`, `mapper_id`, `assembly_id`, `raw_reads`,
   `raw_bases`, `clip_bases`, `reads_mapped`, `reads_paired`, `bases_mapped`,
@@ -441,6 +443,20 @@ SELECT `row_id`, `mapstats_id`, `lane_id`, `mapper_id`, `assembly_id`, `raw_read
   `percentage_reads_with_transposon`, `is_qc`, `prefix`
 FROM `mapstats` WHERE `mapstats`.`latest` = 1
 ) );
+
+__PACKAGE__->belongs_to(
+  "assembly",
+  "Bio::Track::Schema::Result::Assembly",
+  { 'foreign.assembly_id' => 'self.assembly_id' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+__PACKAGE__->belongs_to(
+  "mapper",
+  "Bio::Track::Schema::Result::Mapper",
+  { 'foreign.mapper_id' => 'self.mapper_id' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
 
 __PACKAGE__->meta->make_immutable( inline_constructor => 0 );
 1;
