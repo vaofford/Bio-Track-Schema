@@ -342,6 +342,20 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+# explicitly set the ResultSet class that goes along with this Result. This
+# is needed to make sure that ResultSet::LatestLane gets correctly associated
+# with this Result if we're using Bio::Track::ReducedSchema rather than the
+# full Bio::Track::Schema.
+#
+# The reason for this is that the full Schema class uses load_namespace() to
+# load all of the Result and ResultSet classes automatically, and associates
+# corresponding pairs. The Bio::Track::ReducedSchema class uses load_classes()
+# instead of load_namespaces(), which means that the ResultSet classes don't
+# get automatically associated, so the methods that we add in
+# ResultSet::LatestLane aren't available unless we explicitly associate it like
+# this.
+__PACKAGE__->resultset_class('Bio::Track::Schema::ResultSet::LatestLane');
+
 # the guts of this are cargo-culted from VRTrack::VRTrack::hierarchy_path_of_object
 # and associated VRTrack classes
 
