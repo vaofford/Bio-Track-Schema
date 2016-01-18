@@ -13,4 +13,7 @@ perl:
 #     - master
 install:
   - "cpanm Dist::Zilla --notest"
-script: "dzil test"
+script:
+  - "dzil authordeps --missing | cpanm"
+  - "dzil listdeps --missing | cpanm"
+  - "dzil test"
