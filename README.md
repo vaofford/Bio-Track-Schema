@@ -1,2 +1,2 @@
 # Bio-Track-Schema
-DBIC schema for pathogens tracking databases
+DBIx::Class schema for pathogens tracking databases
