@@ -1,9 +1,6 @@
 use utf8;
 package Bio::Track::Schema::Result::LatestSeqRequest;
 
-### Created by DBIx::Class::Schema::Loader
-### DO NOT MODIFY THE FIRST PART OF THIS FILE
-
 =head1 NAME
 
 Bio::Track::Schema::Result::LatestSeqRequest - VIEW
@@ -13,10 +10,7 @@ Bio::Track::Schema::Result::LatestSeqRequest - VIEW
 use strict;
 use warnings;
 
-use Moose;
-use MooseX::NonMoose;
-use MooseX::MarkAsMethods autoclean => 1;
-extends 'Bio::Track::Schema::ResultBase';
+use base 'Bio::Track::Schema::ResultBase';
 
 __PACKAGE__->table_class("DBIx::Class::ResultSource::View");
 
@@ -169,16 +163,10 @@ __PACKAGE__->add_columns(
 );
 
 
-# Modified above this point; do not regenerate with loader
-#
-### Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-07-30 09:36:06
-### DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Nr1gpOASNV+r/Htj0aPXrA
-
 __PACKAGE__->result_source_instance->view_definition( q(
 SELECT `row_id`, `seq_request_id`, `library_id`, `multiplex_pool_id`, `ssid`,
   `seq_type`, `seq_status`, `note_id`, `changed`, `latest`
 FROM `seq_request` WHERE `seq_request`.`latest` = 1
 ) );
 
-__PACKAGE__->meta->make_immutable( inline_constructor => 0 );
 1;

@@ -1,9 +1,6 @@
 use utf8;
 package Bio::Track::Schema::Result::LatestFile;
 
-### Created by DBIx::Class::Schema::Loader
-### DO NOT MODIFY THE FIRST PART OF THIS FILE
-
 =head1 NAME
 
 Bio::Track::Schema::Result::LatestFile - VIEW
@@ -13,10 +10,7 @@ Bio::Track::Schema::Result::LatestFile - VIEW
 use strict;
 use warnings;
 
-use Moose;
-use MooseX::NonMoose;
-use MooseX::MarkAsMethods autoclean => 1;
-extends 'Bio::Track::Schema::ResultBase';
+use base 'Bio::Track::Schema::ResultBase';
 
 __PACKAGE__->table_class("DBIx::Class::ResultSource::View");
 
@@ -170,12 +164,6 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 1, size => 255 },
 );
 
-
-# Modified above this point; do not regenerate with loader
-#
-### Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-07-30 09:36:06
-### DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:xWYG6MdWc+1fQz/zLHd8eg
-
 __PACKAGE__->result_source_instance->view_definition( q(
 SELECT `row_id`, `file_id`, `lane_id`, `name`, `hierarchy_name`, `processed`,
   `type`, `readlen`, `raw_reads`, `raw_bases`, `mean_q`, `md5`, `note_id`,
@@ -190,5 +178,4 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );
 
-__PACKAGE__->meta->make_immutable( inline_constructor => 0 );
 1;

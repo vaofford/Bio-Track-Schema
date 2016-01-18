@@ -1,9 +1,6 @@
 use utf8;
 package Bio::Track::Schema::Result::LatestMapstat;
 
-### Created by DBIx::Class::Schema::Loader
-### DO NOT MODIFY THE FIRST PART OF THIS FILE
-
 =head1 NAME
 
 Bio::Track::Schema::Result::LatestMapstat - VIEW
@@ -13,10 +10,7 @@ Bio::Track::Schema::Result::LatestMapstat - VIEW
 use strict;
 use warnings;
 
-use Moose;
-use MooseX::NonMoose;
-use MooseX::MarkAsMethods autoclean => 1;
-extends 'Bio::Track::Schema::ResultBase';
+use base 'Bio::Track::Schema::ResultBase';
 
 __PACKAGE__->table_class("DBIx::Class::ResultSource::View");
 
@@ -421,11 +415,6 @@ __PACKAGE__->add_columns(
 );
 
 
-# Modified above this point; do not regenerate with loader
-#
-### Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-07-30 09:36:06
-### DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:FTt0lgx5rSERNNs0nFg4bQ
-
 __PACKAGE__->set_primary_key('row_id');
 
 __PACKAGE__->result_source_instance->view_definition( q(
@@ -458,5 +447,4 @@ __PACKAGE__->belongs_to(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-__PACKAGE__->meta->make_immutable( inline_constructor => 0 );
 1;
