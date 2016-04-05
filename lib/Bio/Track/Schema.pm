@@ -84,5 +84,27 @@ sub get_lanes_by_id {
 
 #-------------------------------------------------------------------------------
 
+=head2 get_all_lanes
+
+Returns a L<DBIx::Class::ResultSet|ResultSet> containing all
+L<Bio::Track::Schema::Result::LatestLane> objects from the current database.
+
+Actually what we're doing here is simply returning the C<ResultSet> for the
+C<LatestLane> table, which is the same thing.
+
+B<Note> that there's no mechanism here to filter on the C<processed> bit field.
+If you want to do that, walk the resultset and do it explicitly.
+
+=cut
+
+sub get_all_lanes {
+  my ( $self, $processed_flag ) = @_;
+
+  return $self->resultset('LatestLane');
+}
+
+#-------------------------------------------------------------------------------
+
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
+
 1;
