@@ -27,7 +27,7 @@ use Carp qw( croak );
 
 our %_search_methods = (
   lane    => 'get_lanes_by_lane_name',
-  sample  => 'get_lanes_by_sample_names',
+  sample  => 'get_lanes_by_sample_name',
   study   => 'get_lanes_by_study_id',
   library => 'get_lanes_by_library_name',
   species => 'get_lanes_by_species_name',
