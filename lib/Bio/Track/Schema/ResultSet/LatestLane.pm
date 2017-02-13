@@ -60,7 +60,11 @@ sub get_lanes_by_lane_name {
   my @name_like_search;
   for my $current_name (@{$name})
   {
-	  push(@name_like_search, [{ name => { 'like', "$current_name#%" } }]);
+    # No need to do a fuzzy search where a deplexed lane is already provided
+    if(! ($current_name =~ m/#\d+$/))
+    {
+      push(@name_like_search, [{ name => { 'like', "$current_name#%" } }]);
+    }  
   }
 
   my $rs = $self->search(
