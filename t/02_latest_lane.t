@@ -32,44 +32,58 @@ throws_ok { LatestLane->get_lanes_by_lane_name('5477_6', 'a') }
   'exception with bad "processing_flag"';
 
 # search by lane name
-my $lanes_rs = LatestLane->get_lanes_by_lane_name('5477_6');
+my $lanes_rs = LatestLane->get_lanes_by_lane_name(['5477_6']);
 is $lanes_rs->count, 4, 'got 4 lanes using lane name';
 is $lanes_rs->first->name, '5477_6#1', 'got expected lane name';
 
+# search by multiple lane names
+$lanes_rs = LatestLane->get_lanes_by_lane_name(['5477_6','6578_4#1']);
+is $lanes_rs->count, 5, 'got 5 lanes using lane names';
+my @multiple_lanes = $lanes_rs->all;
+is $multiple_lanes[0]->name,  '5477_6#1', 'got expected name first lane';
+is $multiple_lanes[-1]->name, '6578_4#1', 'got expected name for last lane';
+
 # search by sample name
-$lanes_rs = LatestLane->get_lanes_by_sample_name('test1_1');
+$lanes_rs = LatestLane->get_lanes_by_sample_name(['test1_1']);
 is $lanes_rs->count, 1, 'got 1 lane using sample name';
 is $lanes_rs->first->acc, 'ERR028809', 'got expected lane accession';
 
+# search by multiple sample names
+$lanes_rs = LatestLane->get_lanes_by_sample_name(['test1_1','test1_2']);
+is $lanes_rs->count, 2, 'got 2 lanes using sample names';
+@multiple_lanes = $lanes_rs->all;
+is $multiple_lanes[0]->acc,  'ERR028809', 'got expected accession for first lane';
+is $multiple_lanes[-1]->acc, 'ERR028812', 'got expected accession for 2nd lane';
+
 # search by study name
-$lanes_rs = LatestLane->get_lanes_by_study_id('Test Study 1');
+$lanes_rs = LatestLane->get_lanes_by_study_id(['Test Study 1']);
 is $lanes_rs->count, 4, 'got 4 lanes using study name';
 is $lanes_rs->first->name, '5477_6#1', 'got expected lane name';
 is $lanes_rs->first->latest_library->latest_sample->latest_project->ssid, 3,
   'got expected project SSID';
 
 # search by project SSID
-$lanes_rs = LatestLane->get_lanes_by_study_id(3);
+$lanes_rs = LatestLane->get_lanes_by_study_id([3]);
 is $lanes_rs->count, 4, 'got 4 lanes using project SSID';
 is $lanes_rs->first->name, '5477_6#1', 'got expected lane name';
 is $lanes_rs->first->latest_library->latest_sample->latest_project->name, 'Test Study 1',
   'got expected project name';
 
 # search by study name
-$lanes_rs = LatestLane->get_lanes_by_library_name('test1_1');
+$lanes_rs = LatestLane->get_lanes_by_library_name(['test1_1']);
 is $lanes_rs->count, 1, 'got 1 lane using library name';
 is $lanes_rs->first->name, '5477_6#1', 'got expected lane name';
 is $lanes_rs->first->latest_library->latest_sample->latest_project->ssid, 3,
   'got expected project SSID';
 
 # search by species name
-$lanes_rs = LatestLane->get_lanes_by_species_name('Shigella');
+$lanes_rs = LatestLane->get_lanes_by_species_name(['Shigella']);
 is $lanes_rs->count, 4, 'got 4 lanes using species name';
 is $lanes_rs->first->acc, 'ERR047288', 'got expected accession';
 is $lanes_rs->first->latest_library->latest_sample->individual->species->name, 'Shigella flexneri',
   'got expected species name';
 
-$lanes_rs = LatestLane->get_lanes_by_species_name('flexneri');
+$lanes_rs = LatestLane->get_lanes_by_species_name(['flexneri']);
 is $lanes_rs->count, 4, 'got 4 lanes using end of species name';
 is $lanes_rs->first->latest_library->latest_sample->individual->species->name, 'Shigella flexneri',
   'got expected species name';
@@ -89,22 +103,22 @@ is $lanes_rs->first->latest_library->latest_sample->individual->species->name, '
 #  1024 = 0b 0 1 0 0 0 0 0 0 0 0 0 0 - should return 2 different lanes
 #  1536 = 0b 0 1 1 0 0 0 0 0 0 0 0 0 - shouldn't return any lanes
 
-$lanes_rs = LatestLane->get_lanes_by_species_name('flexneri', 1);
+$lanes_rs = LatestLane->get_lanes_by_species_name(['flexneri'], 1);
 is $lanes_rs->count, 4, 'got 4 lanes with processing flag 1';
 
-$lanes_rs = LatestLane->get_lanes_by_species_name('flexneri', 512);
+$lanes_rs = LatestLane->get_lanes_by_species_name(['flexneri'], 512);
 is $lanes_rs->count, 2, 'got 2 lanes with processing flag 512';
 my @lanes = $lanes_rs->all;
 is $lanes[0]->lane_id, 2,  'first row has expected ID (2)';
 is $lanes[1]->lane_id, 22, 'second row has expected ID (22)';
 
-$lanes_rs = LatestLane->get_lanes_by_species_name('flexneri', 1024);
+$lanes_rs = LatestLane->get_lanes_by_species_name(['flexneri'], 1024);
 is $lanes_rs->count, 2, 'got 2 lanes with processing flag 1024';
 @lanes = $lanes_rs->all;
 is $lanes[0]->lane_id, 9,  'first row has expected ID (9)';
 is $lanes[1]->lane_id, 15, 'second row has expected ID (15)';
 
-$lanes_rs = LatestLane->get_lanes_by_species_name('flexneri', 1536);
+$lanes_rs = LatestLane->get_lanes_by_species_name(['flexneri'], 1536);
 is $lanes_rs->count, 0, 'got no lanes with processing flag 1536';
 
 # get IDs from file
