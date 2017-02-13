@@ -36,18 +36,18 @@ throws_ok { Schema->get_lanes_by_id('name', 'bad_type') }
 
 # should work with valid input
 my $lanes_rs;
-lives_ok { $lanes_rs = Schema->get_lanes_by_id('5477_6', 'lane') }
+lives_ok { $lanes_rs = Schema->get_lanes_by_id(['5477_6'], 'lane') }
   'no exception when using "get_lanes_by_id"';
 
 is $lanes_rs->count, 4, 'got 4 lanes using lane name';
 is $lanes_rs->first->name, '5477_6#1', 'got expected lane name';
 
 # check a different ID type
-$lanes_rs = Schema->get_lanes_by_id('flexneri', 'species');
+$lanes_rs = Schema->get_lanes_by_id(['flexneri'], 'species');
 is $lanes_rs->count, 4, 'got 4 lanes using species name';
 
 # check that the processed flag works
-$lanes_rs = Schema->get_lanes_by_id('flexneri', 'species', 512);
+$lanes_rs = Schema->get_lanes_by_id(['flexneri'], 'species', 512);
 is $lanes_rs->count, 2, 'got 2 lanes using species name and processed flag 512';
 
 # check "get_all_lanes"

@@ -57,13 +57,18 @@ sub get_lanes_by_lane_name {
   my ( $self, $name ) = @_;
   # we don't care about $processed_flag here, since it's handled entirely in the
   # 'around' method. Similarly, the 'around' modifier checks for a value in $name
+  my @name_like_search;
+  for my $current_name (@{$name})
+  {
+	  push(@name_like_search, [{ name => { 'like', "$current_name#%" } }]);
+  }
 
   my $rs = $self->search(
     {
       -or => [
         { name => $name },
-        { name => { 'like', "$name#%" } },
         { acc  => $name },
+	\@name_like_search
       ]
     },
     {
@@ -170,7 +175,7 @@ sub get_lanes_by_study_id {
 
   my $terms;
 
-  if ( $id =~ m/^\d+$/ ) {
+  if (@{$id} > 0 && (  $id->[0] =~ m/^\d+$/ )) {
     $terms = {
       -or => [
         { 'latest_project.name' => $id },
@@ -179,7 +184,11 @@ sub get_lanes_by_study_id {
     };
   }
   else {
-    $terms = { 'latest_project.name' => $id };
+      $terms = {
+        -or => [
+          { 'latest_project.name' => $id },
+        ]
+      };
   }
 
   my $rs = $self->search(
@@ -260,10 +269,16 @@ C<processed> column. C<$processed_flag> defaults to 0, i.e. all rows.
 
 sub get_lanes_by_species_name {
   my ( $self, $name ) = @_;
+  
+  my @name_like_search;
+  for my $current_name (@{$name})
+  {
+	  push(@name_like_search, [{ 'species.name' => { 'like', "%$current_name%" } }]);
+  }
 
   my $rs = $self->search(
     {
-      'species.name' => { 'like', "%$name%" }
+      -or => \@name_like_search
     },
     {
       join => {
@@ -279,6 +294,7 @@ sub get_lanes_by_species_name {
 
   return $rs;
 }
+
 
 #-------------------------------------------------------------------------------
 
@@ -337,13 +353,16 @@ sub get_lanes_from_id_list {
     unless ( defined $file_id_type and $file_id_type =~ m/^(lane|sample)$/ );
 
   my @rs;
+  my @all_ids;
   foreach my $id ( @$ids ) {
     next if $id =~ m/^#/; # skip comment lines
     chomp $id;            # trim off newlines before passing ID to the DB
-    my $method = "get_lanes_by_${file_id_type}_name";
-    my $rs = $self->$method($id, $processed_flag);
-    push @rs, $rs->all if $rs;
+    push(@all_ids, $id);
   }
+  
+  my $method = "get_lanes_by_${file_id_type}_name";
+  my $rs = $self->$method(\@all_ids, $processed_flag);
+  push @rs, $rs->all if $rs;
 
   return \@rs;
 }
